@@ -91,8 +91,36 @@ def skills():
 @app.command()
 def dossie(cnpj: str = typer.Argument(..., help="CNPJ da empresa para gerar dossiê")):
     """Atalho para gerar dossiê 360º de um CNPJ cruzando todas as bases."""
-    from skills.gov_cruzamentos_auditoria.scripts.dossie_empresa import dossie as run_dossie
-    run_dossie(cnpj=cnpj)
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "dossie_empresa.py"
+    spec = importlib.util.spec_from_file_location("dossie_empresa", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.dossie(cnpj=cnpj)
+
+
+@app.command()
+def auditoria_precos(
+    fator: float = typer.Option(2.0, "--fator", "-f", help="Multiplicador sobre a mediana de mercado"),
+):
+    """Executa auditoria de sobrepreço em itens licitados (ex: mouse a R$ 1.000, café a R$ 90)."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-compras-pncp" / "scripts" / "auditoria_precos.py"
+    spec = importlib.util.spec_from_file_location("auditoria_precos", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.auditar_sobrepreco(fator_sobrepreco=fator)
+
+
+@app.command()
+def auditoria_anomalias():
+    """Varre todas as bases em busca de empresas de fachada, estouro do Simples e contratos desproporcionais."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "detector_anomalias.py"
+    spec = importlib.util.spec_from_file_location("detector_anomalias", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
 
 
 def main():
