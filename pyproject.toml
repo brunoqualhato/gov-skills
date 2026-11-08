@@ -1,0 +1,25 @@
+[project]
+name = "gov-skills"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Bruno Qualhato", email = "brunoqualhato@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb>=2.0.0",
+    "httpx>=0.28.1",
+    "polars>=2.1.0",
+    "pyarrow>=26.0.1",
+    "pydantic>=2.14.3",
+    "python-dotenv>=1.2.4",
+    "rich>=15.0.0",
+    "typer>=0.28.0",
+]
+
+[project.scripts]
+gov-skills = "gov_skills:main"
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"
