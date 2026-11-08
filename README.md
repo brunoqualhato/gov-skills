@@ -33,6 +33,9 @@ O **`gov-skills`** resolve esse desafio transformando esse oceano fragmentado em
 | [`gov-dados-catalogo`](skills/gov-dados-catalogo/SKILL.md) | dados.gov.br | CKAN REST API | Metadados e descoberta de novos conjuntos de dados abertos do Governo Digital. |
 | [`gov-divida-pgfn`](skills/gov-divida-pgfn/SKILL.md) | PGFN / Fazenda | Dados Abertos | Lista de devedores inscritos em Dívida Ativa da União e débitos de FGTS. |
 | [`gov-municipios-querido-diario`](skills/gov-municipios-querido-diario/SKILL.md) | Querido Diário / OKBR | REST API Pública | Busca textual completa em Diários Oficiais Municipais (DOMs) de todo o Brasil. |
+| [`gov-controle-tcu`](skills/gov-controle-tcu/SKILL.md) | TCU | Dados Abertos | Contas julgadas irregulares (Ficha Limpa) e empresas declaradas inidôneas pelo TCU. |
+| [`gov-saude-cmed`](skills/gov-saude-cmed/SKILL.md) | CMED / Anvisa | Dados Abertos | Teto de preços de remédios, Preço Fabricante (PF) e desconto obrigatório do CAP. |
+| [`gov-fiscal-pacto-federativo`](skills/gov-fiscal-pacto-federativo/SKILL.md) | RFB & STN | SQL Lakehouse | Balanço Fiscal Federativo: Estados que mais recebem auxílios vs o que arrecadam. |
 | [`gov-cruzamentos-auditoria`](skills/gov-cruzamentos-auditoria/SKILL.md) | Multi-órgãos | SQL Lakehouse | **Meta-skill**: Dossiê 360º de CNPJs, teia societária e detecção de anomalias/red flags. |
 
 ---
@@ -136,7 +139,25 @@ uv run gov-skills auditoria-emendas-pix
 # 6. Devedores da Dívida Ativa da União (PGFN) recebendo dinheiro público no PNCP
 uv run gov-skills auditoria-pgfn
 
-# 7. Varredura geral de inconsistências cadastrais e de faturamento (Simples Nacional)
+# 7. Balanço Fiscal Federativo: Ranking de dependência de auxílios e transferências por estado
+uv run gov-skills balanco-federativo
+
+# 8. A Empresa Sem Funcionários: Contratos milionários com 0 funcionários no CAGED/RAIS
+uv run gov-skills auditoria-capacidade
+
+# 9. Cronologia Suspeita: Empresas recém-criadas vencendo licitações de alto valor
+uv run gov-skills auditoria-cronologia
+
+# 10. Medicamentos Superfaturados no SUS: Compras acima do teto regulatório da CMED/Anvisa
+uv run gov-skills auditoria-medicamentos
+
+# 11. O Triângulo Eleitoral: Doador de Campanha (TSE) -> Cota Parlamentar (CEAP) -> Licitações
+uv run gov-skills auditoria-triangulo
+
+# 12. Nepotismo Oculto: Parentesco entre agentes públicos locais e empresas vencedoras
+uv run gov-skills auditoria-nepotismo
+
+# 13. Varredura geral de inconsistências cadastrais e de faturamento (Simples Nacional)
 uv run gov-skills auditoria-anomalias
 ```
 

@@ -178,6 +178,79 @@ def auditoria_pgfn():
     module.scan()
 
 
+@app.command()
+def balanco_federativo(
+    ano: int = typer.Option(2024, "--ano", "-a", help="Ano de referência das contas fiscais"),
+):
+    """Analisa os estados que mais recebem auxílios e transferências em relação ao que geram de tributos federais."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-fiscal-pacto-federativo" / "scripts" / "balanco_federativo.py"
+    spec = importlib.util.spec_from_file_location("balanco_federativo", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.exibir_relatorio()
+
+
+@app.command()
+def auditoria_capacidade(
+    min_contrato: float = typer.Option(500000.0, "--min-contrato", help="Valor mínimo de contrato"),
+    max_funcionarios: int = typer.Option(2, "--max-funcionarios", help="Máximo de funcionários para considerar incapacidade"),
+):
+    """Detecta empresas sem funcionários registrados no CAGED/MTE vencendo contratos milionários."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_capacidade_operacional.py"
+    spec = importlib.util.spec_from_file_location("auditoria_capacidade_operacional", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(min_contrato=min_contrato, max_funcionarios=max_funcionarios)
+
+
+@app.command()
+def auditoria_cronologia(
+    dias: int = typer.Option(180, "--dias", "-d", help="Diferença máxima de dias entre abertura da empresa e contrato"),
+):
+    """Detecta empresas recém-criadas que venceram contratos de alto valor logo após a sua fundação."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_cronologia_suspeita.py"
+    spec = importlib.util.spec_from_file_location("auditoria_cronologia_suspeita", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(dias_maximos=dias)
+
+
+@app.command()
+def auditoria_medicamentos():
+    """Audita medicamentos comprados no SUS contra o teto obrigatório da CMED/Anvisa."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_medicamentos_cmed.py"
+    spec = importlib.util.spec_from_file_location("auditoria_medicamentos_cmed", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_triangulo():
+    """Rastreia o Triângulo Eleitoral: Doador de Campanha (TSE) -> Cota Parlamentar (CEAP) -> Licitações (PNCP)."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_triangulo_eleitoral.py"
+    spec = importlib.util.spec_from_file_location("auditoria_triangulo_eleitoral", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_nepotismo():
+    """Identifica laços de parentesco e nepotismo velado entre gestores locais e empresas licitantes."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_nepotismo_parentesco.py"
+    spec = importlib.util.spec_from_file_location("auditoria_nepotismo_parentesco", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
 def main():
     app()
 
