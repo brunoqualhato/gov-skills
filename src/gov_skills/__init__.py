@@ -46,9 +46,41 @@ def info():
             "bcb_expectativas_focus": "Banco Central (Relatório Focus)",
             "camara_deputados": "Câmara dos Deputados (Parlamentares)",
             "camara_ceap_despesas": "Câmara dos Deputados (Cota CEAP)",
+            "camara_emendas_parlamentares": "Câmara dos Deputados (Emendas Pix)",
             "cgu_sancoes": "CGU (Sanções CEIS/CNEP)",
+            "cgu_servidores_siape": "CGU (Servidores Federais SIAPE)",
+            "cgu_beneficios_cidadao": "MDS & CGU (Bolsa Família & BPC)",
             "rfb_empresas": "Receita Federal (Empresas CNPJ)",
             "rfb_socios": "Receita Federal (Quadro Societário QSA)",
+            "pgfn_divida_ativa": "PGFN (Dívida Ativa da União)",
+            "tcu_contas_irregulares": "TCU (Contas Irregulares Ficha Limpa)",
+            "tcu_empresas_inidoneas": "TCU (Empresas Inidôneas)",
+            "tse_candidatos": "TSE (Candidaturas Oficiais)",
+            "tse_doacoes": "TSE (Doações de Campanha)",
+            "tse_bens_declarados": "TSE (Declaração de Bens)",
+            "cmed_precos_medicamentos": "CMED / Anvisa (Teto de Medicamentos)",
+            "anp_precos_combustiveis": "ANP (Preços de Combustíveis)",
+            "transferegov_convenios": "MGI / Transferegov (Convênios Federais)",
+            "obrasgov_obras_publicas": "MGI / Obrasgov (Obras Públicas Federais)",
+            "cnj_processos_judiciais": "CNJ / DataJud (Processos & Falências)",
+            "comex_balanca_comercial": "MDIC / Comex Stat (Comércio Exterior)",
+            "bndes_operacoes_financiamento": "BNDES (Financiamentos & Crédito)",
+            "inep_escolas_censo": "INEP / MEC (Censo Escolar)",
+            "inep_ideb_municipios": "INEP / MEC (Indicadores do IDEB)",
+            "datasus_estabelecimentos_cnes": "DataSUS (Hospitais & Leitos CNES)",
+            "mte_caged_saldos_municipais": "Ministério do Trabalho (Novo CAGED)",
+            "mte_caged_empresas_quadro": "Ministério do Trabalho (Quadro Empregados)",
+            "ibama_autos_infracao": "IBAMA (Multas e Fiscalização Ambiental)",
+            "ibama_areas_embargadas": "IBAMA (Áreas Rurais Embargadas)",
+            "inpe_alertas_desmatamento": "INPE (DETER Alertas de Desmatamento)",
+            "senado_senadores": "Senado Federal (Parlamentares)",
+            "senado_ceaps_despesas": "Senado Federal (Cota CEAPS)",
+            "dou_publicacoes_atos": "Imprensa Nacional (Diário Oficial DOU)",
+            "catalogo_conjuntos_dados": "dados.gov.br (Catálogo de Dados Abertos)",
+            "siconfi_transferencias": "Tesouro Nacional (Repasses Siconfi)",
+            "siconfi_gastos_funcao": "Tesouro Nacional (Gastos por Função)",
+            "querido_diario_publicacoes": "Querido Diário (Diários Municipais)",
+            "pacto_federativo_balanco": "Receita & STN (Balanço Federativo)",
         }
 
         for tbl in sorted(tables):
@@ -249,6 +281,78 @@ def auditoria_nepotismo():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     module.scan()
+
+
+@app.command()
+def score_risco_contratos(
+    min_score: int = typer.Option(25, "--min-score", "-s", help="Score mínimo de risco (0 a 100)"),
+):
+    """Calcula score unificado de risco forense (0 a 100) para todos os contratos do PNCP."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_risco_contratos.py"
+    spec = importlib.util.spec_from_file_location("auditoria_risco_contratos", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(min_score=min_score)
+
+
+@app.command()
+def auditoria_combustiveis(
+    fator: float = typer.Option(1.25, "--fator", "-f", help="Multiplicador sobre a média da ANP"),
+):
+    """Audita sobrepreço de combustíveis em compras de frotas e cotas parlamentares contra a ANP."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_combustiveis.py"
+    spec = importlib.util.spec_from_file_location("auditoria_combustiveis", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(fator_alerta=fator)
+
+
+@app.command()
+def auditoria_obras():
+    """Identifica empreiteiras com obras públicas paralisadas/abandonadas vencendo novos contratos no PNCP."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_obras_paralisadas.py"
+    spec = importlib.util.spec_from_file_location("auditoria_obras_paralisadas", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_eficiencia():
+    """Benchmark de eficiência municipal: Gastos em Educação (Siconfi) x Nota do IDEB (INEP)."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_eficiencia_gastos.py"
+    spec = importlib.util.spec_from_file_location("auditoria_eficiencia_gastos", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_esg():
+    """Rastreia empresas com multas ambientais ou embargos do IBAMA contratadas pelo governo ou financiadas pelo BNDES."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_esg_desmatamento.py"
+    spec = importlib.util.spec_from_file_location("auditoria_esg_desmatamento", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_teia(
+    min_empresas: int = typer.Option(2, "--min-empresas", "-m", help="Mínimo de empresas compartilhadas por um sócio"),
+):
+    """Mapeia teia de relacionamentos societários, sócios em comum e grupos econômicos ocultos."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_teia_societaria.py"
+    spec = importlib.util.spec_from_file_location("auditoria_teia_societaria", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(min_empresas=min_empresas)
 
 
 def main():

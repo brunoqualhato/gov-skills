@@ -82,6 +82,41 @@ class CrossMatcher:
             )
             report["doacoes_eleitorais"] = doacoes
 
+        # 6. Dívida Ativa PGFN
+        if "pgfn_divida_ativa" in tables:
+            report["divida_ativa_pgfn"] = self.db.query(
+                "SELECT * FROM pgfn_divida_ativa WHERE cnpj_cpf_devedor = ? OR cnpj_raiz = ?",
+                [cnpj_limpo, cnpj_raiz],
+            )
+
+        # 7. Processos Judiciais DataJud / CNJ
+        if "cnj_processos_judiciais" in tables:
+            report["processos_judiciais"] = self.db.query(
+                "SELECT * FROM cnj_processos_judiciais WHERE cpf_cnpj_parte = ? OR cnpj_raiz_parte = ?",
+                [cnpj_limpo, cnpj_raiz],
+            )
+
+        # 8. Meio Ambiente IBAMA
+        if "ibama_autos_infracao" in tables:
+            report["autos_ibama"] = self.db.query(
+                "SELECT * FROM ibama_autos_infracao WHERE cpf_cnpj_infrator = ? OR cnpj_raiz = ?",
+                [cnpj_limpo, cnpj_raiz],
+            )
+
+        # 9. Obras Públicas Obrasgov
+        if "obrasgov_obras_publicas" in tables:
+            report["obras_executadas"] = self.db.query(
+                "SELECT * FROM obrasgov_obras_publicas WHERE cnpj_executor = ? OR cnpj_raiz_executor = ?",
+                [cnpj_limpo, cnpj_raiz],
+            )
+
+        # 10. Crédito BNDES
+        if "bndes_operacoes_financiamento" in tables:
+            report["financiamentos_bndes"] = self.db.query(
+                "SELECT * FROM bndes_operacoes_financiamento WHERE cnpj_cliente = ? OR cnpj_raiz_cliente = ?",
+                [cnpj_limpo, cnpj_raiz],
+            )
+
         return report
 
     def list_available_linkages(self) -> List[Dict[str, str]]:
@@ -90,18 +125,18 @@ class CrossMatcher:
         relations = [
             {
                 "chave": "CNPJ / CNPJ Raiz",
-                "tabelas_conectadas": [t for t in ["rfb_empresas", "rfb_socios", "pncp_contratos", "cgu_sancoes", "tse_doacoes", "camara_ceap"] if t in current_tables],
-                "descricao": "Cruza contratos públicos com sócios de empresas, sanções do CEIS/CNEP e doações de campanha.",
+                "tabelas_conectadas": [t for t in ["rfb_empresas", "rfb_socios", "pncp_contratos", "cgu_sancoes", "tse_doacoes", "camara_ceap_despesas", "pgfn_divida_ativa", "tcu_empresas_inidoneas", "cnj_processos_judiciais", "ibama_autos_infracao", "obrasgov_obras_publicas", "bndes_operacoes_financiamento", "anp_precos_combustiveis"] if t in current_tables],
+                "descricao": "Cruza contratos públicos com sócios, sanções, dívida ativa, falências, desmatamento, obras e crédito do BNDES.",
             },
             {
                 "chave": "Código IBGE Município",
-                "tabelas_conectadas": [t for t in ["ibge_municipios", "siconfi_orcamentos", "inep_censo_escolar", "datasus_leitos", "caged_emprego"] if t in current_tables],
-                "descricao": "Cruza demografia do Censo com finanças municipais, educação (IDEB), saúde e emprego formal.",
+                "tabelas_conectadas": [t for t in ["ibge_municipios", "siconfi_transferencias", "siconfi_gastos_funcao", "inep_escolas_censo", "inep_ideb_municipios", "datasus_estabelecimentos_cnes", "mte_caged_saldos_municipais", "anp_precos_combustiveis", "transferegov_convenios", "obrasgov_obras_publicas", "comex_balanca_comercial"] if t in current_tables],
+                "descricao": "Cruza demografia do Censo com finanças municipais, educação (IDEB), saúde (SUS), emprego (CAGED), comércio exterior e preços ANP.",
             },
             {
                 "chave": "CPF Mascarado / Nome",
-                "tabelas_conectadas": [t for t in ["rfb_socios", "cgu_servidores", "tse_candidatos", "camara_deputados"] if t in current_tables],
-                "descricao": "Identifica servidores públicos federais ou políticos que constam como sócios de empresas ou fornecedores.",
+                "tabelas_conectadas": [t for t in ["rfb_socios", "cgu_servidores_siape", "cgu_beneficios_cidadao", "tse_candidatos", "camara_deputados", "senado_senadores"] if t in current_tables],
+                "descricao": "Identifica servidores federais, beneficiários de auxílios (laranjas) ou políticos atuando como sócios de empresas licitantes.",
             },
         ]
         return relations

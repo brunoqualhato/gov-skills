@@ -12,7 +12,7 @@ O **`gov-skills`** resolve esse desafio transformando esse oceano fragmentado em
 
 ---
 
-## 🏛️ Matriz Geral de Skills (16 Domínios Governamentais)
+## 🏛️ Matriz Geral de Skills (22+ Domínios Governamentais)
 
 | Skill | Órgão / Fonte | Tipo de Acesso | O que a Skill Domina |
 | :--- | :--- | :--- | :--- |
@@ -29,6 +29,12 @@ O **`gov-skills`** resolve esse desafio transformando esse oceano fragmentado em
 | [`gov-educacao-inep`](skills/gov-educacao-inep/SKILL.md) | INEP / MEC | Microdados & APIs | Censo Escolar (180k escolas), notas e indicadores do IDEB e dados do ENEM. |
 | [`gov-trabalho-mte`](skills/gov-trabalho-mte/SKILL.md) | Ministério do Trabalho | Microdados / FTP | Novo CAGED (saldo mensal de contratações/demissões CLT por município e setor CNAE). |
 | [`gov-ambiente-inpe-ibama`](skills/gov-ambiente-inpe-ibama/SKILL.md) | INPE & IBAMA | APIs & GeoJSON | Desmatamento (DETER/PRODES), focos de queimadas, autos de infração e embargos ambientais. |
+| [`gov-energia-combustiveis-anp`](skills/gov-energia-combustiveis-anp/SKILL.md) | ANP | Dados Abertos | Levantamento semanal de preços de combustíveis (gasolina, diesel, etanol, GNV) por posto. |
+| [`gov-infra-obras-transferegov`](skills/gov-infra-obras-transferegov/SKILL.md) | MGI / Transferegov | REST & Dumps | Convênios federais e acompanhamento de obras públicas (Obrasgov.br - paralisadas e atrasadas). |
+| [`gov-judiciario-cnj-datajud`](skills/gov-judiciario-cnj-datajud/SKILL.md) | CNJ (DataJud) | API Pública / Dados | Base Nacional do Judiciário: Ações de improbidade, execuções fiscais, falências e recuperações. |
+| [`gov-social-beneficios-mds`](skills/gov-social-beneficios-mds/SKILL.md) | MDS & CGU | REST API & CSVs | Folha de pagamento de programas sociais: Bolsa Família, BPC (idosos/deficientes) e Seguro Defeso. |
+| [`gov-comex-mdic-secex`](skills/gov-comex-mdic-secex/SKILL.md) | MDIC / SECEX | Microdados Parquet | Balança comercial internacional: exportações e importações detalhadas por NCM e município. |
+| [`gov-credito-bndes`](skills/gov-credito-bndes/SKILL.md) | BNDES | Dados Abertos | Operações de crédito direto e indireto, financiamentos incentivados (Finame/Finem) e subsídios. |
 | [`gov-diario-oficial-dou`](skills/gov-diario-oficial-dou/SKILL.md) | Imprensa Nacional | InCom / DOU | Atos normativos (Seção 1), nomeações/pessoal (Seção 2) e contratos/editais (Seção 3). |
 | [`gov-dados-catalogo`](skills/gov-dados-catalogo/SKILL.md) | dados.gov.br | CKAN REST API | Metadados e descoberta de novos conjuntos de dados abertos do Governo Digital. |
 | [`gov-divida-pgfn`](skills/gov-divida-pgfn/SKILL.md) | PGFN / Fazenda | Dados Abertos | Lista de devedores inscritos em Dívida Ativa da União e débitos de FGTS. |
@@ -36,7 +42,7 @@ O **`gov-skills`** resolve esse desafio transformando esse oceano fragmentado em
 | [`gov-controle-tcu`](skills/gov-controle-tcu/SKILL.md) | TCU | Dados Abertos | Contas julgadas irregulares (Ficha Limpa) e empresas declaradas inidôneas pelo TCU. |
 | [`gov-saude-cmed`](skills/gov-saude-cmed/SKILL.md) | CMED / Anvisa | Dados Abertos | Teto de preços de remédios, Preço Fabricante (PF) e desconto obrigatório do CAP. |
 | [`gov-fiscal-pacto-federativo`](skills/gov-fiscal-pacto-federativo/SKILL.md) | RFB & STN | SQL Lakehouse | Balanço Fiscal Federativo: Estados que mais recebem auxílios vs o que arrecadam. |
-| [`gov-cruzamentos-auditoria`](skills/gov-cruzamentos-auditoria/SKILL.md) | Multi-órgãos | SQL Lakehouse | **Meta-skill**: Dossiê 360º de CNPJs, teia societária e detecção de anomalias/red flags. |
+| [`gov-cruzamentos-auditoria`](skills/gov-cruzamentos-auditoria/SKILL.md) | Multi-órgãos | SQL Lakehouse | **Meta-skill**: Dossiê 360º de CNPJs, teia societária, scoring e detecção de anomalias/red flags. |
 
 ---
 
@@ -159,6 +165,24 @@ uv run gov-skills auditoria-nepotismo
 
 # 13. Varredura geral de inconsistências cadastrais e de faturamento (Simples Nacional)
 uv run gov-skills auditoria-anomalias
+
+# 14. 🚨 NOVO: Score de Risco Licitatório Forense (0 a 100) integrando todos os red flags
+uv run gov-skills score-risco-contratos --min-score 25
+
+# 15. ⛽ NOVO: Auditoria de Combustíveis e Frotas Públicas contra tabela ANP
+uv run gov-skills auditoria-combustiveis --fator 1.25
+
+# 16. 🏗️ NOVO: Obras Públicas Paralisadas / Abandonadas vencendo novos contratos no PNCP
+uv run gov-skills auditoria-obras
+
+# 17. 📈 NOVO: Benchmark de Eficiência de Gastos Municipais (Educação Siconfi x IDEB INEP)
+uv run gov-skills auditoria-eficiencia
+
+# 18. 🌳 NOVO: ESG Público: Empresas com Multas Ambientais do IBAMA contratadas ou no BNDES
+uv run gov-skills auditoria-esg
+
+# 19. 🕸️ NOVO: Teia Societária: Sócios conectando múltiplos CNPJs e Grupos Econômicos Ocultos
+uv run gov-skills auditoria-teia --min-empresas 2
 ```
 
 ---

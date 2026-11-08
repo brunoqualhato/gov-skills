@@ -1,7 +1,7 @@
 [project]
 name = "gov-skills"
 version = "0.1.0"
-description = "Add your description here"
+description = "Ecossistema de skills para agentes de IA e Data Lakehouse em DuckDB para inteligência e auditoria de dados públicos abertos do Brasil"
 authors = [
     { name = "Bruno Qualhato", email = "brunoqualhato@gmail.com" }
 ]
