@@ -181,8 +181,38 @@ uv run gov-skills auditoria-eficiencia
 # 18. 🌳 NOVO: ESG Público: Empresas com Multas Ambientais do IBAMA contratadas ou no BNDES
 uv run gov-skills auditoria-esg
 
-# 19. 🕸️ NOVO: Teia Societária: Sócios conectando múltiplos CNPJs e Grupos Econômicos Ocultos
+# 19. 🕸️ Teia Societária: Sócios conectando múltiplos CNPJs e Grupos Econômicos Ocultos
 uv run gov-skills auditoria-teia --min-empresas 2
+
+# 20. 📊 Lei de Benford: Teste estatístico Qui-Quadrado e MAD para detectar notas fiscais forjadas
+uv run gov-skills auditoria-benford --min-notas 150
+
+# 21. ✂️ Fracionamento de Despesa: Fatiamento de compras/dispensas para burlar o teto da Lei 14.133/21
+uv run gov-skills auditoria-fracionamento --teto 59906.02
+
+# 22. 🎠 Carrossel de Licitações: Rodízio sequencial de empresas vencendo no mesmo órgão (Bid-Rigging)
+uv run gov-skills auditoria-carrossel
+
+# 23. ⏰ Super-Servidores: Acúmulo ilegal de cargos, violação de Dedicação Exclusiva e jornada > 60h/sem
+uv run gov-skills auditoria-acumulo-cargos --max-horas 60
+
+# 24. 🚪 Porta Giratória: Ex-autoridades exoneradas no DOU assumindo empresas antes da quarentena (Lei 12.813)
+uv run gov-skills auditoria-porta-giratoria --quarentena 180
+
+# 25. 🗳️ Voto por Emenda: Econometria eleitoral cruzando Emendas Pix com desempenho nas urnas (TSE)
+uv run gov-skills auditoria-voto-emenda
+
+# 26. 🏛️ Triângulo das ONGs (MROSC): Entidades sem fins lucrativos recém-abertas e sem funcionários
+uv run gov-skills auditoria-ongs-fachada
+
+# 27. 💊 Supercompra de Medicamentos: Aquisição de doses em volume incompatível com população/leitos SUS
+uv run gov-skills auditoria-supercompra-medicamentos --max-doses-hab 20
+
+# 28. 🚚 Logística Impossível: Fornecimento diário/perecível por empresas a milhares de km (Haversine)
+uv run gov-skills auditoria-logistica-impossivel --max-km 300
+
+# 29. 📉 Gov Z-Score de Insolvência: Risco preditivo de quebra e abandono de contrato público
+uv run gov-skills auditoria-insolvencia
 ```
 
 ---

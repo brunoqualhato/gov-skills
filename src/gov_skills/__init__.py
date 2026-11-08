@@ -81,6 +81,11 @@ def info():
             "siconfi_gastos_funcao": "Tesouro Nacional (Gastos por Função)",
             "querido_diario_publicacoes": "Querido Diário (Diários Municipais)",
             "pacto_federativo_balanco": "Receita & STN (Balanço Federativo)",
+            "auditoria_vinculos_profissionais": "Multi-órgãos (Vínculos SIAPE/CNES/INEP/CLT)",
+            "tse_votacao_municipio": "TSE (Votação Nominal por Município)",
+            "transferegov_termos_mrosc": "MGI / Transferegov (Parcerias ONGs MROSC)",
+            "auditoria_compras_medicamentos_volume": "SUS / PNCP (Volume de Medicamentos)",
+            "auditoria_logistica_contratos": "Geointeligência (Malha Logística de Contratos)",
         }
 
         for tbl in sorted(tables):
@@ -353,6 +358,128 @@ def auditoria_teia(
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     module.scan(min_empresas=min_empresas)
+
+
+@app.command()
+def auditoria_benford(
+    min_notas: int = typer.Option(150, "--min-notas", "-m", help="Mínimo de notas por fornecedor"),
+):
+    """Aplica a Lei de Benford (Teste Qui-Quadrado e MAD) para detectar notas fiscais e recibos forjados."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_benford.py"
+    spec = importlib.util.spec_from_file_location("auditoria_benford", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(min_notas=min_notas)
+
+
+@app.command()
+def auditoria_fracionamento(
+    teto: float = typer.Option(59906.02, "--teto", "-t", help="Teto legal de dispensa de licitação (Lei 14.133/21)"),
+):
+    """Detecta fracionamento ilegal de despesas (fatiamento de compras para burlar licitação)."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_fracionamento.py"
+    spec = importlib.util.spec_from_file_location("auditoria_fracionamento", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(teto_dispensa=teto)
+
+
+@app.command()
+def auditoria_carrossel():
+    """Detecta padrão de rodízio / carrossel de licitantes (bid-rigging rotation) em órgãos públicos."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_carrossel_licitacoes.py"
+    spec = importlib.util.spec_from_file_location("auditoria_carrossel_licitacoes", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_acumulo_cargos(
+    max_horas: int = typer.Option(60, "--max-horas", "-h", help="Limite máximo de carga horária semanal"),
+):
+    """Identifica 'Super-Servidores' com acúmulo ilegal de cargos, violação de DE ou jornada > 60h/semana."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_acumulo_cargos.py"
+    spec = importlib.util.spec_from_file_location("auditoria_acumulo_cargos", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(max_horas=max_horas)
+
+
+@app.command()
+def auditoria_porta_giratoria(
+    quarentena: int = typer.Option(180, "--quarentena", "-q", help="Período legal de quarentena em dias"),
+):
+    """Detecta conflito de interesses por 'Porta Giratória' (Lei 12.813/2013) entre exonerações no DOU e QSA."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_porta_giratoria.py"
+    spec = importlib.util.spec_from_file_location("auditoria_porta_giratoria", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(dias_quarentena=quarentena)
+
+
+@app.command()
+def auditoria_voto_emenda():
+    """Econometria Eleitoral: calcula o retorno de votos e o custo por voto das Emendas Pix (TSE x Câmara)."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_voto_emenda.py"
+    spec = importlib.util.spec_from_file_location("auditoria_voto_emenda", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_ongs_fachada():
+    """Audita o Triângulo das ONGs: Termos de Fomento/Colaboração (MROSC) com entidades sem estrutura operacional."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_ongs_fachada.py"
+    spec = importlib.util.spec_from_file_location("auditoria_ongs_fachada", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_supercompra_medicamentos(
+    max_doses_hab: float = typer.Option(20.0, "--max-doses-hab", "-d", help="Corte de alerta em doses por habitante"),
+):
+    """Detecta supercompra de medicamentos em volume incompatível com a população e leitos SUS locais."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_supercompra_medicamentos.py"
+    spec = importlib.util.spec_from_file_location("auditoria_supercompra_medicamentos", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(max_doses_hab=max_doses_hab)
+
+
+@app.command()
+def auditoria_logistica_impossivel(
+    max_km: float = typer.Option(300.0, "--max-km", "-k", help="Distância máxima viável (km) para entrega diária sem filial"),
+):
+    """Detecta contratos de itens perecíveis/entrega diária vencidos por empresas a milhares de km sem filial."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_logistica_impossivel.py"
+    spec = importlib.util.spec_from_file_location("auditoria_logistica_impossivel", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan(max_km_perecivel=max_km)
+
+
+@app.command()
+def auditoria_insolvencia():
+    """Calcula o Gov Z-Score preditivo de risco de quebra/abandono contratual de fornecedores públicos."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_insolvencia_fornecedor.py"
+    spec = importlib.util.spec_from_file_location("auditoria_insolvencia_fornecedor", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
 
 
 def main():
