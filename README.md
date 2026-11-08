@@ -31,6 +31,8 @@ O **`gov-skills`** resolve esse desafio transformando esse oceano fragmentado em
 | [`gov-ambiente-inpe-ibama`](skills/gov-ambiente-inpe-ibama/SKILL.md) | INPE & IBAMA | APIs & GeoJSON | Desmatamento (DETER/PRODES), focos de queimadas, autos de infração e embargos ambientais. |
 | [`gov-diario-oficial-dou`](skills/gov-diario-oficial-dou/SKILL.md) | Imprensa Nacional | InCom / DOU | Atos normativos (Seção 1), nomeações/pessoal (Seção 2) e contratos/editais (Seção 3). |
 | [`gov-dados-catalogo`](skills/gov-dados-catalogo/SKILL.md) | dados.gov.br | CKAN REST API | Metadados e descoberta de novos conjuntos de dados abertos do Governo Digital. |
+| [`gov-divida-pgfn`](skills/gov-divida-pgfn/SKILL.md) | PGFN / Fazenda | Dados Abertos | Lista de devedores inscritos em Dívida Ativa da União e débitos de FGTS. |
+| [`gov-municipios-querido-diario`](skills/gov-municipios-querido-diario/SKILL.md) | Querido Diário / OKBR | REST API Pública | Busca textual completa em Diários Oficiais Municipais (DOMs) de todo o Brasil. |
 | [`gov-cruzamentos-auditoria`](skills/gov-cruzamentos-auditoria/SKILL.md) | Multi-órgãos | SQL Lakehouse | **Meta-skill**: Dossiê 360º de CNPJs, teia societária e detecção de anomalias/red flags. |
 
 ---
@@ -112,14 +114,30 @@ Cruza instantaneamente **Receita Federal + Sócios (QSA) + Contratos do PNCP + G
 uv run python skills/gov-cruzamentos-auditoria/scripts/dossie_empresa.py --cnpj 31003259000110
 ```
 
-### 3. Executar o Detector de Anomalias de Auditoria
-Varre o banco de dados em busca de red flags:
-- Empresas no **Simples Nacional** que faturaram contratos acima do teto de R$ 4,8 milhões/ano.
-- Fornecedores com **capital social desproporcional** (> 20x) em relação aos contratos recebidos.
-- Empresas que receberam simultaneamente da **Câmara (Legislativo)** e de **Contratos Federais (Executivo)**.
+### 3. Executar o Detector de Anomalias e Auditorias Forenses
+O ecossistema possui algoritmos forenses para varrer o banco em busca de red flags:
 
 ```bash
-uv run python skills/gov-cruzamentos-auditoria/scripts/detector_anomalias.py
+# 1. Auditoria de Preços e Sobrepreço (ex: mouse a mil reais, café a R$ 90)
+uv run gov-skills auditoria-precos --fator 2.0
+
+# 2. Conluio & Cartel: Empresas distintas com mesmo telefone, e-mail ou endereço na Receita
+uv run gov-skills auditoria-cartel
+
+# 3. Sócios Laranjas: Beneficiários do Bolsa Família/BPC donos de empresas licitantes
+uv run gov-skills auditoria-laranjas
+
+# 4. Conflito de Interesses: Servidores federais da ativa (SIAPE) administrando empresas
+uv run gov-skills auditoria-servidores
+
+# 5. O Ciclo das Emendas Pix: Deputado envia verba -> Município contrata fornecedor correlato
+uv run gov-skills auditoria-emendas-pix
+
+# 6. Devedores da Dívida Ativa da União (PGFN) recebendo dinheiro público no PNCP
+uv run gov-skills auditoria-pgfn
+
+# 7. Varredura geral de inconsistências cadastrais e de faturamento (Simples Nacional)
+uv run gov-skills auditoria-anomalias
 ```
 
 ---

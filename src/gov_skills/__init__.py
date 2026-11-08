@@ -123,6 +123,61 @@ def auditoria_anomalias():
     module.scan()
 
 
+@app.command()
+def auditoria_cartel():
+    """Detecta conluio e cartel: empresas distintas que compartilham o mesmo e-mail, telefone ou endereço físico."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_cartel_conluio.py"
+    spec = importlib.util.spec_from_file_location("auditoria_cartel_conluio", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_laranjas():
+    """Identifica sócios/administradores de empresas licitantes que recebem Bolsa Família ou BPC."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_laranjas.py"
+    spec = importlib.util.spec_from_file_location("auditoria_laranjas", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_servidores():
+    """Identifica servidores públicos federais da ativa (SIAPE) atuando como administradores de empresas."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_conflito_servidor.py"
+    spec = importlib.util.spec_from_file_location("auditoria_conflito_servidor", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_emendas_pix():
+    """Rastreia o ciclo das Emendas Pix: do parlamentar ao município e ao fornecedor contratado."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_emendas_pix.py"
+    spec = importlib.util.spec_from_file_location("auditoria_emendas_pix", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
+@app.command()
+def auditoria_pgfn():
+    """Identifica fornecedores públicos vencedores de licitação que possuem Dívida Ativa da União na PGFN."""
+    import importlib.util
+    script_path = BASE_DIR / "skills" / "gov-cruzamentos-auditoria" / "scripts" / "auditoria_pgfn_licitantes.py"
+    spec = importlib.util.spec_from_file_location("auditoria_pgfn_licitantes", script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.scan()
+
+
 def main():
     app()
 
